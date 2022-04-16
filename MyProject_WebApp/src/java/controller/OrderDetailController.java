@@ -1,6 +1,7 @@
 
 package controller;
 
+import controller.auth.BaseRequiredAuthController;
 import dal.CustomerDBContext;
 import dal.ProductDBContext;
 import java.io.IOException;
@@ -19,10 +20,11 @@ import model.Product;
  *
  * @author PCDELL
  */
-public class OrderDetailController extends HttpServlet {// lam du lieu truyen len checkout
+public class OrderDetailController extends BaseRequiredAuthController {// lam du lieu truyen len checkout
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    @Override
+    protected void processGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
         Account account = (Account)request.getSession().getAttribute("account");
         CustomerDBContext Cdb = new CustomerDBContext();
         ArrayList<Customer> customers = Cdb.getCustomersByAcc(account);
@@ -69,33 +71,10 @@ public class OrderDetailController extends HttpServlet {// lam du lieu truyen le
         request.getRequestDispatcher("Checkout.jsp").forward(request, response);
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void processPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
     }
 
     /**
