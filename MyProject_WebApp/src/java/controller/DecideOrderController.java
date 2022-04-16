@@ -7,6 +7,7 @@ package controller;
 
 import controller.auth.BaseRequiredAuthController;
 import dal.CustomerDBContext;
+import dal.OdersDBContext;
 import dal.ProductDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,15 +24,14 @@ import model.Orders;
 import model.Product;
 
 public class DecideOrderController extends BaseRequiredAuthController{
-    int orderId;
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String RecipientName = request.getParameter("Recipient");
-        String City = request.getParameter("City");
-        String Address = request.getParameter("Address");
-        String PhoneNumber = request.getParameter("PhoneNumber");
+        String oderId = request.getParameter("OrderId");
         String note = request.getParameter("note");
+        int cusid = Integer.parseInt(request.getParameter("Customer"));
+        
+//------------Lay ra List Product va so luong moi product
         
         // Lay cookies
         Cookie arr[] = request.getCookies();
@@ -63,30 +63,31 @@ public class DecideOrderController extends BaseRequiredAuthController{
                 }
             }
         }
-        int total = 0;
-        for (Product o : products) {
-            total = total + o.getCount()* o.getUnitprice();
-        }
+        // Co product roi lam gi nua?
         //insert lai
-        //insert vao customer-->
-        Customer c = new Customer(RecipientName,City, Address, PhoneNumber);
+        
+        //Tim Cus
+        CustomerDBContext cdb = new CustomerDBContext();
+        Customer c = cdb.getCustomerById(cusid);
+        
         //INSERT VAO ORDER
         Orders o = new Orders();
-        String demo = String.valueOf(orderId)+'a';
-        orderId++;
-        o.setId(demo); 
+        o.setId(oderId); 
         o.setNote(note);
+        
         o.setCus(c);
         //Insert vao orderdetail
         for (Product p : products) {
             OrderDetails odetails = new OrderDetails();
             odetails.setO(o);
             odetails.setP(p);
+            odetails.setQuantity(p.getCount());
             o.getOrderDetails().add(odetails);
         }
-        CustomerDBContext db = new CustomerDBContext();
+        OdersDBContext db = new OdersDBContext();
         db.insert(o);
-        
+
+        //xoa session tro ve trang home
         for (Cookie od : arr) {
             if (od.getName().equals("pid")) {
                 od.setMaxAge(0);

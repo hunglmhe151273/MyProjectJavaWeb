@@ -7,10 +7,6 @@ package model;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author PCDELL
- */
 public class Customer {
     private int CusId;
     private String RecipientName;
@@ -18,7 +14,27 @@ public class Customer {
     private String Address;
     private String PhoneNumber;
     private ArrayList<Orders> Orders = new ArrayList<>();
+    private Account createdby;
 
+    public Account getCreatedby() {
+        return createdby;
+    }
+
+    public void setCreatedby(Account createdby) {
+        this.createdby = createdby;
+    }
+    
+    public Customer(int CusId, String RecipientName, String City, String Address, String PhoneNumber, Account createdby) {
+        this.CusId = CusId;
+        this.RecipientName = RecipientName;
+        this.City = City;
+        this.Address = Address;
+        this.PhoneNumber = PhoneNumber;
+        this.createdby = createdby;
+    }
+    
+    
+    
     public int getCusId() {
         return CusId;
     }
@@ -36,8 +52,6 @@ public class Customer {
     public void setOrders(ArrayList<Orders> Orders) {
         this.Orders = Orders;
     }
-    
-    
     public Customer() {
     }
 

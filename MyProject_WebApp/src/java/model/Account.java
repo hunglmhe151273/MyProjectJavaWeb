@@ -7,16 +7,29 @@ package model;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author dell
- */
 public class Account {
     private String username;
     private String password;
-    private String displayName;
 
+    
     ArrayList<Feature> features = new ArrayList<>();
+    ArrayList<Customer> customers = new ArrayList<>();
+
+    public Account() {
+    }
+
+    public Account(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public ArrayList<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(ArrayList<Customer> customers) {
+        this.customers = customers;
+    }
 
     public ArrayList<Feature> getFeatures() {
         return features;
@@ -42,12 +55,5 @@ public class Account {
         this.password = password;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
     
 }

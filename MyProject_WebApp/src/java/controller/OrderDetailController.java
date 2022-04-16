@@ -1,6 +1,7 @@
 
 package controller;
 
+import dal.CustomerDBContext;
 import dal.ProductDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,16 +11,22 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.Account;
+import model.Customer;
 import model.Product;
 
 /**
  *
  * @author PCDELL
  */
-public class OrderDetailController extends HttpServlet {
+public class OrderDetailController extends HttpServlet {// lam du lieu truyen len checkout
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        Account account = (Account)request.getSession().getAttribute("account");
+        CustomerDBContext Cdb = new CustomerDBContext();
+        ArrayList<Customer> customers = Cdb.getCustomersByAcc(account);
+        request.setAttribute("customers", customers);
         // Lay cookies
         Cookie arr[] = request.getCookies();
         ArrayList<Product> products = new ArrayList<>();
@@ -57,6 +64,7 @@ public class OrderDetailController extends HttpServlet {
         
         request.setAttribute("products", products);
         request.setAttribute("total", total);
+        
         
         request.getRequestDispatcher("Checkout.jsp").forward(request, response);
     }

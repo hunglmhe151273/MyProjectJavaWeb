@@ -8,9 +8,12 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Account;
 import model.Customer;
+import model.Feature;
 import model.OrderDetails;
 import model.Orders;
 
@@ -19,86 +22,63 @@ import model.Orders;
  * @author PCDELL
  */
 public class CustomerDBContext extends DBContext{
-    
-    public void insert(Orders o) {
-        try {
-            connection.setAutoCommit(false);
-            //insert customer
-            String sql = "INSERT INTO [Customer]\n" +
-                            "           ([CustomerName]\n" +
-                            "           ,[Address]\n" +
-                            "           ,[City]\n" +
-                            "           ,[PhoneNumber])\n" +
-                            "     VALUES\n" +
-                            "           (?\n" +
-                            "           ,?\n" +
-                            "		,?\n" +
-                            "           ,?\n" +
-                            "           )";
+    public ArrayList<Customer> getCustomersByAcc(Account acc)
+    {
+        ArrayList<Customer> customers = new ArrayList<>();
+         try {
+            String sql = "SELECT [ID]\n" +
+                            "      ,[CustomerName]\n" +
+                            "      ,[Address]\n" +
+                            "      ,[Country]\n" +
+                            "      ,[City]\n" +
+                            "      ,[State]\n" +
+                            "      ,[PostalCode]\n" +
+                            "      ,[PhoneNumber]\n" +
+                            "      ,[createdby]\n" +
+                            "  FROM [Customer] c inner join Account a on c.createdby = a.username\n" +
+                            "  where a.username = ?";
             PreparedStatement stm = connection.prepareStatement(sql);
-            stm.setString(1, o.getCus().getRecipientName() );
-            stm.setString(2, o.getCus().getAddress() );
-            stm.setString(3, o.getCus().getCity());
-            stm.setString(4, o.getCus().getPhoneNumber());
-            stm.executeUpdate();
-            //Tim customerId tu tang
-            String sql_get_id = "SELECT @@IDENTITY as sid";
-            PreparedStatement stm_get_id = connection.prepareStatement(sql_get_id);
-            ResultSet rs = stm_get_id.executeQuery();
-            if (rs.next()) {
-                o.getCus().setCusId(rs.getInt("sid"));
+            stm.setString(1, acc.getUsername());
+            ResultSet rs = stm.executeQuery();
+            while(rs.next())
+            {
+                Customer c = new Customer();
+                c.setCusId(rs.getInt("ID"));
+                c.setRecipientName(rs.getString("CustomerName"));
+                customers.add(c);
             }
-            
-            //insert order
-            String sql_order = "INSERT INTO [Orders]\n" +
-                                "           ([ID]\n" +
-                                "           ,[CustomerID]\n" +
-                                "           ,[OrderNote])\n" +
-                                "     VALUES\n" +
-                                "           (?\n" +
-                                "           ,?\n" +
-                                "           ,?\n" +
-                                "               )";
-            PreparedStatement stm_order = connection.prepareStatement(sql_order);
-            stm_order.setString(1, o.getId());
-            stm_order.setInt(2, o.getCus().getCusId());
-            stm.setString(3, o.getNote());
-            stm.executeUpdate();
-            
-            //insert odetails
-
-            for (OrderDetails od : o.getOrderDetails() ) {
-                String sql_OrderDetails = "INSERT INTO [OrderDetails]\n" +
-                                    "           ([OrderID]\n" +
-                                    "           ,[ProductID]\n" +
-                                    "           ,[Quantity])\n" +
-                                    "     VALUES\n" +
-                                    "           (?\n" +
-                                    "           ,?\n" +
-                                    "           ,?\n" +
-                                    "		   )";
-                PreparedStatement stm_OrderDetails = connection.prepareStatement(sql_OrderDetails);
-                stm_OrderDetails.setString(1, od.getO().getId());
-                stm_OrderDetails.setInt(2, od.getP().getPid());
-                stm_OrderDetails.setInt(3, od.getQuantity());
-                stm_OrderDetails.executeUpdate();
-            }
-
-            connection.commit();
         } catch (SQLException ex) {
             Logger.getLogger(CustomerDBContext.class.getName()).log(Level.SEVERE, null, ex);
-            try {
-                connection.rollback();
-            } catch (SQLException ex1) {
-                Logger.getLogger(CustomerDBContext.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException ex) {
-                Logger.getLogger(CustomerDBContext.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
-
+        return customers;
     }
+     public Customer getCustomerById(int id)
+    {
+        Customer c = new Customer();
+         try {
+            String sql = "SELECT [ID]\n" +
+                        "      ,[CustomerName]\n" +
+                        "      ,[Address]\n" +
+                        "      ,[Country]\n" +
+                        "      ,[City]\n" +
+                        "      ,[State]\n" +
+                        "      ,[PostalCode]\n" +
+                        "      ,[PhoneNumber]\n" +
+                        "      ,[createdby]\n" +
+                        "  FROM [Customer]\n" +
+                        "  where Id = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setInt(1, id);
+            ResultSet rs = stm.executeQuery();
+            if(rs.next())
+            {
+                c.setCusId(rs.getInt("ID"));
+                c.setRecipientName(rs.getString("CustomerName"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CustomerDBContext.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return c;
+    }
+    
 }
