@@ -36,17 +36,14 @@ public class HomeController extends HttpServlet {
             response.sendRedirect("region");
         }else{
         int srid = curregion.getRid();
-        // lay ra het region
+  
         regionDBContext context = new regionDBContext();
         ArrayList<region> regions = context.getRegions();
-        //cho rid vao trong session
         curregion = context.getRegionById(srid);
         session.setAttribute("curregion", curregion);
         CategoryDBContext catedb = new CategoryDBContext();
         ArrayList<Category> cates = catedb.getCategoryWithSubs(srid);
-        
-        //cookies cart----------------------------------------------------
-        // Lay cookies
+       
         Cookie arr[] = request.getCookies();
         ArrayList<Product> products = new ArrayList<>();
         // lay product theo id co the lap lai
